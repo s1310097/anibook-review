@@ -2,61 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Inertia\Response;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): Response
+    
+    public function show($id)
     {
-        return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
+        $user = User::findOrFail($id);
+        \Log::info('Showing user:', $user->toArray());
+
+     return Inertia::render('Profile/MyProfile', [
+            'user' => $user,
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function edit($id)
     {
-        $request->user()->fill($request->validated());
+        $user = User::findOrFail($id);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
+        return Inertia::render('Profile/EditProfile', [
+            'user' => $user,
+        ]);
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
+        $user = User::findOrFail($id);
+        \Log::info('Updating user:', $request->all());
+        $user->update($request->only('name', 'favorite_work', 'bio', 'is_public'));
+        \Log::info('Updated user:', $user->toArray());
 
+        return Redirect::route('profile.show', ['id' => $user->id]);
+    }
+
+    public function destroy(Request $request)
+    {
         $user = $request->user();
-
         Auth::logout();
-
         $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
 
         return Redirect::to('/');
     }
