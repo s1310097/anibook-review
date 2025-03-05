@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'favorite_work' => 'ドラゴンボール', // お気に入りの作品を設定
+            'bio' => 'よろしくお願いします！', // 自己紹介
+            'is_public' => true, // 公開設定
         ]);
     }
 }
