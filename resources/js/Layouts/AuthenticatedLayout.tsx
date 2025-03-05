@@ -59,6 +59,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
+                                        <Dropdown.Link href={'/works'}>
+                                            Works Search
+                                        </Dropdown.Link>
                                         <Dropdown.Link href={`/profile/${user.id}`}>
                                             Profile
                                         </Dropdown.Link>

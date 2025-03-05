@@ -29,6 +29,9 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'favorite_work' => fake()->word(), // ランダムな単語を設定
+            'bio' => fake()->sentence(), // ランダムな文章を設定
+            'is_public' => fake()->boolean(), // true または false
         ];
     }
 

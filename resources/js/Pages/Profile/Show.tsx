@@ -1,15 +1,34 @@
 import React from "react";
 import { Head } from "@inertiajs/react";
 
-const Show = ({ user }) => {
+type User = {
+    name: string;
+    favorite_work?: string;
+    bio?: string;
+    [key: string]: any;
+};
+
+type Field = {
+    label: string;
+    key: string;
+};
+
+type ProfileProps = {
+    title?: string;
+    user: User;
+    fields: Field[];
+};
+
+const Profile: React.FC<ProfileProps> = ({ title, user, fields }) => {
     return (
         <div style={{ padding: "20px" }}>
-            <Head title={`${user.name}のプロフィール`} />
-            <h1>{user.name}のプロフィール</h1>
-            <p>好きな作品: {user.favorite_work || '未設定'}</p>
-            <p>自己紹介: {user.bio || '未設定'}</p>
+            <Head title={title || `${user.name}のプロフィール`} />
+            <h1>{title || `${user.name}のプロフィール`}</h1>
+            {fields.map((field, index) => (
+                <p key={index}>{field.label}: {user[field.key] || '未設定'}</p>
+            ))}
         </div>
     );
 };
 
-export default Show;
+export default Profile;

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import GuestLayout from "@/Layouts/GuestLayout";
+import { Inertia } from "@inertiajs/inertia";
 import "./EditProfile.css";
 
 const EditProfile = ({ user }) => {
@@ -13,8 +14,14 @@ const EditProfile = ({ user }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("profile.update", { id: user.id }));
+        put(route("profile.update", { id: user.id }), {
+            onSuccess: () => {
+                // データが更新された後に自動的に profile.show にリダイレクト
+                window.location.href = route("profile.show", { id: user.id });
+            },
+        });
     };
+    
 
     return (
         <GuestLayout pageTitle="Edit Profile">
@@ -68,8 +75,6 @@ const EditProfile = ({ user }) => {
                         {processing ? "保存中..." : "保存"}
                     </button>
                 </form>
-               
-                        
             </div>
         </GuestLayout>
     );
