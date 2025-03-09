@@ -25,6 +25,7 @@ export default forwardRef(function TextInput(
                 className
             }
             ref={localRef}
+            style={{ width: '70%', height: '35px' }} // ここで幅と高さを指定
         />
     );
 });

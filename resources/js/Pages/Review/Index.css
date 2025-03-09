@@ -1,0 +1,36 @@
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.review-list {
+    list-style: none;
+    padding: 0;
+}
+
+.review-item {
+    border-bottom: 1px solid #ccc;
+    padding: 15px 0;
+}
+
+.review-item h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.review-item p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.detail-link {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
+}

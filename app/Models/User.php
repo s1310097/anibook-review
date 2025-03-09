@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'favorite_work', // 追加
+        'bio',           // 追加
+        'is_public',     // 追加
     ];
 
     /**
@@ -43,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_public' => 'boolean', // 追加（公開設定を boolean としてキャスト）
         ];
     }
 }
