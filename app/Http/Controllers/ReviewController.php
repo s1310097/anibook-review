@@ -29,13 +29,12 @@ class ReviewController extends Controller
     }
 
     // レビューを保存する
-    public function store(Request $request, $workId)
+    public function store(Request $request, $workId, $workType)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'review_text' => 'required|string|max:1000',
             'is_public' => 'boolean',
-            'work_type' => 'required|string|in:anime,book',
         ]);
 
         $review = Review::create([
@@ -44,15 +43,55 @@ class ReviewController extends Controller
             'title' => $validated['title'],
             'review_text' => $validated['review_text'],
             'is_public' => $validated['is_public'],
-            'work_type' => $validated['work_type'],
+            'work_type' => $workType,
         ]);
 
         return response()->json($review, 201);
     }
 
-    public function index()
+    public function index($workId, $workType)
     {
-        $reviews = Review::all();
-        return;
+        $reviews = Review::where('work_id', $workId)->where('work_type', $workType)->get();
+        return response()->json($reviews);
+    }
+
+    public function show($workId, $workType, $reviewId)
+    {
+        $review = Review::where('work_id', $workId)->where('work_type', $workType)->where('id', $reviewId)->first();
+        if (!$review) {
+            return response()->json(['message' => 'レビューが見つかりません。'], 404);
+        }
+
+        return response()->json($review);
+    }
+
+    public function update(Request $request, $workId, $workType, $reviewId)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'review_text' => 'required|string|max:1000',
+            'is_public' => 'boolean',
+        ]);
+
+        $review = Review::where('work_id', $workId)->where('work_type', $workType)->where('id', $reviewId)->first();
+        if (!$review) {
+            return response()->json(['message' => 'レビューが見つかりません。'], 404);
+        }
+
+        $review->update($validated);
+
+        return response()->json($review);
+    }
+
+    public function destroy($workId, $workType, $reviewId)
+    {
+        $review = Review::where('work_id', $workId)->where('work_type', $workType)->where('id', $reviewId)->first();
+        if (!$review) {
+            return response()->json(['message' => 'レビューが見つかりません。'], 404);
+        }
+
+        $review->delete();
+
+        return response()->json(['message' => 'レビューが削除されました。']);
     }
 }

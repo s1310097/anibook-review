@@ -1,83 +1,88 @@
 import React, { useState } from "react";
-import "./ReviewForm.css";
+import { useNavigate } from "react-router-dom";
 
 interface ReviewFormProps {
-  workId: string | undefined;
+  workId: string;
   workType: "anime" | "book";
 }
 
 const ReviewForm: React.FC<ReviewFormProps> = ({ workId, workType }) => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [reviewText, setReviewText] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(false);
+  const [error, setError] = useState("");
 
-  // レビュー送信
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) {
-      alert("レビューする作品タイトルを入力してください");
-      return;
-    }
-    if (!workId) {
-      alert("作品IDが取得できませんでした");
-      return;
-    }
+    setError("");
 
     try {
       const response = await fetch(`/api/works/${workId}/${workType}/reviews`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          review_text: reviewText,
-          is_public: isPublic,
-          work_type: workType,
-        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: title, review_text: reviewText, is_public: isPublic, work_type: workType }),
       });
 
-      if (response.ok) {
-        alert("レビューを投稿しました！");
-      } else {
-        const errorText = await response.text(); // JSONとして解析できない場合のためにtextとして取得
-        alert(`レビュー投稿に失敗しました: ${errorText}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "レビューの投稿に失敗しました。");
       }
+
+      const data = await response.json();
+
+      // レビューが正常に投稿された場合、レビュー一覧ページにリダイレクト
+      navigate(`/works/${workId}/${workType}/reviews`);
     } catch (error) {
-      console.error("レビュー投稿エラー:", error);
-      alert("エラーが発生しました");
+      console.error("⚠️ レビュー投稿エラー:", error);
+      setError(error.message || "レビューの投稿に失敗しました。");
     }
   };
 
   return (
-    <div className="review-form-container">
-      <h2>レビュー投稿</h2>
-
-      {/* レビュー投稿フォーム */}
-      <form onSubmit={handleSubmit} className="review-form">
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>タイトル</label>
         <input
           type="text"
-          placeholder="作品タイトル"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          required
+          style={{ padding: "10px", margin: "10px 0", width: "300px" }}
         />
+      </div>
+      <div>
+        <label>レビュー</label>
         <textarea
-          placeholder="レビュー内容 (500文字以内)"
-          maxLength={500}
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}
-          required
+          style={{ padding: "10px", margin: "10px 0", width: "300px", height: "100px" }}
         />
+      </div>
+      <div>
         <label>
           <input
             type="checkbox"
             checked={isPublic}
-            onChange={() => setIsPublic(!isPublic)}
+            onChange={(e) => setIsPublic(e.target.checked)}
           />
-          公開する
+          公開
         </label>
-        <button type="submit">投稿</button>
-      </form>
-    </div>
+      </div>
+      <button
+        type="submit"
+        style={{
+          padding: "10px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          border: "none",
+        }}
+      >
+        投稿
+      </button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </form>
   );
 };
 

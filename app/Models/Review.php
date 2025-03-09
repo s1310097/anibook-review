@@ -11,10 +11,10 @@ class Review extends Model
 
     protected $fillable = [
         'user_id', 
-        'title',      // 🔹 作品タイトル
-        'work_id',    // 🔹 APIから取得した作品ID
-        'work_type',  // 🔹 作品の種類（anime / book）
-        'image_url',  // 🔹 作品画像URL
+        'title',      // 作品タイトル
+        'work_id',    // APIから取得した作品ID
+        'work_type',  // 作品の種類（anime / book）
+        'image_url',  // 作品画像URL
         'review_text',
         'is_public',
     ];
