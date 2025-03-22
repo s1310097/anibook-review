@@ -1,3 +1,5 @@
+import "./Checkbox.css"
+
 export default function Checkbox({ className = '', ...props }) {
     return (
         <input

@@ -25,6 +25,8 @@ export default function ForgotPassword({ status }) {
                 allow you to choose a new one.
             </div>
 
+            <h2 className="mt-6 text-2xl font-semibold text-gray-700">Forgot your password?</h2>
+
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
                     {status}
@@ -36,6 +38,7 @@ export default function ForgotPassword({ status }) {
                     id="email"
                     type="email"
                     name="email"
+                    placeholder="Enter your Email"
                     value={data.email}
                     className="mt-1 block w-full"
                     isFocused={true}
