@@ -12,32 +12,58 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ workId, workType }) => {
   const [reviewText, setReviewText] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+
+    const apiUrl = `http://localhost:8000/api/works/${workId}/${workType}/reviews`;
+    const requestData = {
+      work_id: workId,         
+      work_type: workType,      
+      title: title,
+      review_text: reviewText,
+      is_public: isPublic,
+    };
+
+    console.log("🚀 APIリクエスト URL:", apiUrl);
+    console.log("📤 送信データ:", requestData);
 
     try {
-      const response = await fetch(`/api/works/${workId}/${workType}/reviews`, {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title: title, review_text: reviewText, is_public: isPublic, work_type: workType }),
+        body: JSON.stringify(requestData),
       });
 
+      const responseText = await response.text(); 
+      console.log("📩 APIレスポンス:", responseText);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "レビューの投稿に失敗しました。");
+        throw new Error(`APIエラー: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      if (!responseText) {
+        console.warn("⚠️ 空のレスポンスを受け取りました");
+        navigate(`/works/${workId}/${workType}/reviews`);
+        return;
+      }
 
-      // レビューが正常に投稿された場合、レビュー一覧ページにリダイレクト
+      // JSONパース
+      const data = JSON.parse(responseText);
+      console.log("✅ 成功データ:", data);
+
+      // 成功したらレビュー一覧にリダイレクト
       navigate(`/works/${workId}/${workType}/reviews`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("⚠️ レビュー投稿エラー:", error);
       setError(error.message || "レビューの投稿に失敗しました。");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,12 +100,14 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ workId, workType }) => {
         type="submit"
         style={{
           padding: "10px",
-          backgroundColor: "#4CAF50",
+          backgroundColor: loading ? "#ccc" : "#4CAF50",
           color: "white",
           border: "none",
+          cursor: loading ? "not-allowed" : "pointer",
         }}
+        disabled={loading}
       >
-        投稿
+        {loading ? "送信中..." : "投稿"}
       </button>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </form>

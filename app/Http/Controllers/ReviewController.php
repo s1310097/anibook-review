@@ -17,6 +17,13 @@ class ReviewController extends Controller
         } elseif ($workType === 'book') {
             // Google Books APIを使用して本の詳細を取得
             $response = Http::get("https://www.googleapis.com/books/v1/volumes/{$workId}");
+        } else {
+            return response()->json(['error' => '無効なworkTypeです'], 400);
+        }
+
+        // APIリクエストのエラーハンドリング
+        if (!$response->successful()) {
+            return response()->json(['error' => '外部APIからデータを取得できませんでした'], $response->status());
         }
 
         $workDetails = $response->json();
@@ -34,7 +41,7 @@ class ReviewController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'review_text' => 'required|string|max:1000',
-            'is_public' => 'boolean',
+            'is_public' => 'nullable|boolean', // nullも許可する
         ]);
 
         $review = Review::create([
@@ -42,7 +49,7 @@ class ReviewController extends Controller
             'user_id' => auth()->id(),
             'title' => $validated['title'],
             'review_text' => $validated['review_text'],
-            'is_public' => $validated['is_public'],
+            'is_public' => $validated['is_public'] ?? false, // nullならfalseに
             'work_type' => $workType,
         ]);
 
@@ -59,7 +66,7 @@ class ReviewController extends Controller
     {
         $review = Review::where('work_id', $workId)->where('work_type', $workType)->where('id', $reviewId)->first();
         if (!$review) {
-            return response()->json(['message' => 'レビューが見つかりません。'], 404);
+            return response()->json(['message' => "ID {$reviewId} のレビューが見つかりません。"], 404);
         }
 
         return response()->json($review);
@@ -75,7 +82,7 @@ class ReviewController extends Controller
 
         $review = Review::where('work_id', $workId)->where('work_type', $workType)->where('id', $reviewId)->first();
         if (!$review) {
-            return response()->json(['message' => 'レビューが見つかりません。'], 404);
+            return response()->json(['message' => "ID {$reviewId} のレビューが見つかりません。"], 404);
         }
 
         $review->update($validated);
@@ -87,7 +94,7 @@ class ReviewController extends Controller
     {
         $review = Review::where('work_id', $workId)->where('work_type', $workType)->where('id', $reviewId)->first();
         if (!$review) {
-            return response()->json(['message' => 'レビューが見つかりません。'], 404);
+            return response()->json(['message' => "ID {$reviewId} のレビューが見つかりません。"], 404);
         }
 
         $review->delete();

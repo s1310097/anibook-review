@@ -13,7 +13,7 @@ import MenuBar from './Components/MenuBar';
 // 既存のページ
 import SearchPage from "../js/Pages/Work/Index";
 import DetailPage from "../js/Pages/Review/Index";
-import CreateReview from "../js/Pages/Review/CreateReview";
+import CreateReview from "../js/Pages/Review/CreateReview"; // CreateReviewコンポーネント
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

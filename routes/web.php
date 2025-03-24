@@ -60,9 +60,10 @@ Route::middleware('auth')->group(function () {
      * 作品ごとのレビュー関連ルート
      */
     Route::prefix('works/{workId}/{workType}/reviews')->group(function () {
+        // 作品ごとのレビュー一覧
         Route::get('/', [ReviewController::class, 'index'])->name('works.reviews.index');
 
-        // レビュー作成ページ (Inertia) に変更
+        // レビュー作成ページ
         Route::get('/create', function ($workId, $workType) {
             if (!in_array($workType, ['anime', 'book'])) {
                 abort(404, '無効な作品タイプです');
@@ -70,10 +71,17 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('Reviews/Create', ['workId' => $workId, 'workType' => $workType]);
         })->middleware('auth')->name('works.reviews.create');
 
+        // レビュー作成（POST）
         Route::post('/', [ReviewController::class, 'store'])->name('works.reviews.store');
+
+        // レビュー詳細
         Route::get('/{reviewId}', [ReviewController::class, 'show'])->name('works.reviews.show');
+
+        // レビュー編集
         Route::get('/{reviewId}/edit', [ReviewController::class, 'edit'])->name('works.reviews.edit');
         Route::put('/{reviewId}', [ReviewController::class, 'update'])->name('works.reviews.update');
+
+        // レビュー削除
         Route::delete('/{reviewId}', [ReviewController::class, 'destroy'])->name('works.reviews.destroy');
     });
 

@@ -12,7 +12,7 @@ const Index = () => {
             setLoading(true);
             setError("");
             try {
-                const response = await fetch(`/api/works/${workId}/reviews`); //ルートは仮
+                const response = await fetch(`http://localhost:8000/api/works/${workId}/${workType}/reviews`);
                 const data = await response.json();
                 setReviews(data);
             } catch (error) {
